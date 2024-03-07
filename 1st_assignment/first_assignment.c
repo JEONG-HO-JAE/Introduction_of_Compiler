@@ -3,7 +3,7 @@
 #include <string.h>
 
 typedef enum {NULL_VAL, INTEGER, FLOAT} ValueType;
-typedef enum {NUMBER, PLUS, STAR, LP, RP, END} TokenType;
+typedef enum {NUMBER, PLUS, MINUS, STAR, DIVISION, LP, RP, END} TokenType;
 
 typedef struct {
     TokenType tokenType;
@@ -15,7 +15,7 @@ typedef struct {
 } Token;
 
 Token token;
-char currentChar;
+char curChar;
 
 Token expression();
 Token term();
@@ -26,50 +26,93 @@ void error(int);
 Token expression() {
     Token token_from_term_1 = term();
     
-    while (token.tokenType == PLUS) {
+    while (token.tokenType == PLUS || token.tokenType == MINUS) {
+        TokenType op = token.tokenType; 
         get_token();
         Token token_from_term_2 = term(); 
-        if(token_from_term_1.valueType == INTEGER && token_from_term_2.valueType == INTEGER) {
-            token_from_term_1.Value.intValue = token_from_term_1.Value.intValue + token_from_term_2.Value.intValue;
-            token_from_term_1.valueType = INTEGER;
-        }
-        else if (token_from_term_1.valueType == INTEGER && token_from_term_2.valueType == FLOAT) {
-            token_from_term_1.Value.floatValue = token_from_term_1.Value.intValue + token_from_term_2.Value.floatValue;
-            token_from_term_1.valueType = FLOAT;
-        }
-        else if (token_from_term_1.valueType == FLOAT && token_from_term_2.valueType == INTEGER) {
-            token_from_term_1.Value.floatValue = token_from_term_1.Value.floatValue + token_from_term_2.Value.intValue;
-            token_from_term_1.valueType = FLOAT;
-        }
-        else {
-            token_from_term_1.Value.floatValue = token_from_term_1.Value.floatValue + token_from_term_2.Value.floatValue;
-            token_from_term_1.valueType = FLOAT;
+
+        if (op == PLUS) {
+            if(token_from_term_1.valueType == INTEGER && token_from_term_2.valueType == INTEGER) {
+                token_from_term_1.Value.intValue = token_from_term_1.Value.intValue + token_from_term_2.Value.intValue;
+                token_from_term_1.valueType = INTEGER;
+            }
+            else if (token_from_term_1.valueType == INTEGER && token_from_term_2.valueType == FLOAT) {
+                token_from_term_1.Value.floatValue = token_from_term_1.Value.intValue + token_from_term_2.Value.floatValue;
+                token_from_term_1.valueType = FLOAT;
+            }
+            else if (token_from_term_1.valueType == FLOAT && token_from_term_2.valueType == INTEGER) {
+                token_from_term_1.Value.floatValue = token_from_term_1.Value.floatValue + token_from_term_2.Value.intValue;
+                token_from_term_1.valueType = FLOAT;
+            }
+            else {
+                token_from_term_1.Value.floatValue = token_from_term_1.Value.floatValue + token_from_term_2.Value.floatValue;
+                token_from_term_1.valueType = FLOAT;
+            } 
+        } else {
+            if(token_from_term_1.valueType == INTEGER && token_from_term_2.valueType == INTEGER) {
+                token_from_term_1.Value.intValue = token_from_term_1.Value.intValue - token_from_term_2.Value.intValue;
+                token_from_term_1.valueType = INTEGER;
+            }
+            else if (token_from_term_1.valueType == INTEGER && token_from_term_2.valueType == FLOAT) {
+                token_from_term_1.Value.floatValue = token_from_term_1.Value.intValue - token_from_term_2.Value.floatValue;
+                token_from_term_1.valueType = FLOAT;
+            }
+            else if (token_from_term_1.valueType == FLOAT && token_from_term_2.valueType == INTEGER) {
+                token_from_term_1.Value.floatValue = token_from_term_1.Value.floatValue - token_from_term_2.Value.intValue;
+                token_from_term_1.valueType = FLOAT;
+            }
+            else {
+                token_from_term_1.Value.floatValue = token_from_term_1.Value.floatValue - token_from_term_2.Value.floatValue;
+                token_from_term_1.valueType = FLOAT;
+            }
         }
     }
-    
     return token_from_term_1;
 }
 
 Token term() {
     Token token_from_factor_1 = factor();
-    while (token.tokenType == STAR) {
+    while (token.tokenType == STAR || token.tokenType == DIVISION) {
+        TokenType op = token.tokenType;
         get_token();
         Token token_from_factor_2 = factor();
-        if(token_from_factor_1.valueType == INTEGER && token_from_factor_2.valueType == INTEGER) {
+        if (op == STAR) {
+            if (token_from_factor_1.valueType == INTEGER && token_from_factor_2.valueType == INTEGER) {
             token_from_factor_1.Value.intValue = token_from_factor_1.Value.intValue * token_from_factor_2.Value.intValue;
             token_from_factor_1.valueType = INTEGER;
-        }
-        else if (token_from_factor_1.valueType == INTEGER && token_from_factor_2.valueType == FLOAT) {
-            token_from_factor_1.Value.floatValue = token_from_factor_1.Value.intValue * token_from_factor_2.Value.floatValue;
-            token_from_factor_1.valueType = FLOAT;
-        }
-        else if (token_from_factor_1.valueType == FLOAT && token_from_factor_2.valueType == INTEGER) {
-            token_from_factor_1.Value.floatValue = token_from_factor_1.Value.floatValue * token_from_factor_2.Value.intValue;
-            token_from_factor_2.valueType = FLOAT;
-        }
-        else {
-            token_from_factor_1.Value.floatValue = token_from_factor_1.Value.floatValue * token_from_factor_2.Value.floatValue;
-            token_from_factor_2.valueType = FLOAT;
+            }
+            else if (token_from_factor_1.valueType == INTEGER && token_from_factor_2.valueType == FLOAT) {
+                token_from_factor_1.Value.floatValue = token_from_factor_1.Value.intValue * token_from_factor_2.Value.floatValue;
+                token_from_factor_1.valueType = FLOAT;
+            }
+            else if (token_from_factor_1.valueType == FLOAT && token_from_factor_2.valueType == INTEGER) {
+                token_from_factor_1.Value.floatValue = token_from_factor_1.Value.floatValue * token_from_factor_2.Value.intValue;
+                token_from_factor_2.valueType = FLOAT;
+            }
+            else {
+                token_from_factor_1.Value.floatValue = token_from_factor_1.Value.floatValue * token_from_factor_2.Value.floatValue;
+                token_from_factor_2.valueType = FLOAT;
+            }
+        } else {
+            if (token_from_factor_2.valueType == 0) {
+                error(5);
+            }
+            if(token_from_factor_1.valueType == INTEGER && token_from_factor_2.valueType == INTEGER) {
+                token_from_factor_1.Value.intValue = token_from_factor_1.Value.intValue / token_from_factor_2.Value.intValue;
+                token_from_factor_1.valueType = INTEGER;
+            }
+            else if (token_from_factor_1.valueType == INTEGER && token_from_factor_2.valueType == FLOAT) {
+                token_from_factor_1.Value.floatValue = token_from_factor_1.Value.intValue / token_from_factor_2.Value.floatValue;
+                token_from_factor_1.valueType = FLOAT;
+            }
+            else if (token_from_factor_1.valueType == FLOAT && token_from_factor_2.valueType == INTEGER) {
+                token_from_factor_1.Value.floatValue = token_from_factor_1.Value.floatValue / token_from_factor_2.Value.intValue;
+                token_from_factor_1.valueType = FLOAT;
+            }
+            else {
+                token_from_factor_1.Value.floatValue = token_from_factor_1.Value.floatValue / token_from_factor_2.Value.floatValue;
+                token_from_factor_2.valueType = FLOAT;
+            }
         }
     }
     return token_from_factor_1;
@@ -98,31 +141,33 @@ void get_token() {
     int intValue = 0;
     float floatValue = 0.0;
 
-    while ((currentChar == ' ') || (currentChar == '\t')) currentChar = getchar();
-    if (currentChar == '+') { currentChar = getchar(); token.tokenType = PLUS; token.valueType = NULL_VAL; return; }
-	if (currentChar == '*') { currentChar = getchar(); token.tokenType = STAR; token.valueType = NULL_VAL; return; }
-	if (currentChar == '(') { currentChar = getchar(); token.tokenType = LP; token.valueType = NULL_VAL; return; }
-	if (currentChar == ')') { currentChar = getchar(); token.tokenType = RP; token.valueType = NULL_VAL; return; }
-	if (currentChar == '\n') { token.tokenType = END; token.valueType = NULL_VAL; return; }
+    while ((curChar == ' ') || (curChar == '\t')) curChar = getchar();
+    if (curChar == '+') { curChar = getchar(); token.tokenType = PLUS; token.valueType = NULL_VAL; return; }
+    if (curChar == '-') { curChar = getchar(); token.tokenType = MINUS; token.valueType = NULL_VAL; return; }
+	if (curChar == '*') { curChar = getchar(); token.tokenType = STAR; token.valueType = NULL_VAL; return; }
+    if (curChar == '/') { curChar = getchar(); token.tokenType = DIVISION; token.valueType = NULL_VAL; return; }
+	if (curChar == '(') { curChar = getchar(); token.tokenType = LP; token.valueType = NULL_VAL; return; }
+	if (curChar == ')') { curChar = getchar(); token.tokenType = RP; token.valueType = NULL_VAL; return; }
+	if (curChar == '\n') { token.tokenType = END; token.valueType = NULL_VAL; return; }
 
-    if ((currentChar >= '0') && (currentChar <= '9')) {
+    if ((curChar >= '0') && (curChar <= '9')) {
         token.tokenType = NUMBER;
         token.valueType = INTEGER;
         do {
-            intValue = intValue * 10 + currentChar - '0';
-            currentChar = getchar();
-        } while ((currentChar >= '0') && (currentChar <= '9'));
+            intValue = intValue * 10 + curChar - '0';
+            curChar = getchar();
+        } while ((curChar >= '0') && (curChar <= '9'));
         token.Value.intValue = intValue;
         
-        if (currentChar == '.') {
+        if (curChar == '.') {
             token.valueType = FLOAT; 
-            currentChar = getchar(); // jump '.' char
+            curChar = getchar(); // jump '.' char
             float fraction = 0.1;
 
-            while ((currentChar >= '0') && (currentChar <= '9')) {
-                floatValue += (currentChar - '0') * fraction;
+            while ((curChar >= '0') && (curChar <= '9')) {
+                floatValue += (curChar - '0') * fraction;
                 fraction *= 0.1; 
-                currentChar = getchar();
+                curChar = getchar();
             }
             token.Value.floatValue = intValue + floatValue;
         } else {
@@ -137,13 +182,15 @@ void error(int i){
 		case 2: printf("Syntax Error: Missing ')'\n"); break;
 		case 3: printf("Syntax Error: Unexpected End of Expression\n"); break;
         case 4: printf("Syntax Error: Missing '+' or '*'\n"); break;
+        case 5: printf("Error: Division by zero\n"); break;
 	}
 	exit(1);
 }
 
 int main(void){
 	Token result;
-	currentChar = ' ';
+	curChar = ' ';
+    printf("Enter an arithmetic expression: ");
 	get_token();
     result = expression();
     // if (result.valueType==INTEGER)
