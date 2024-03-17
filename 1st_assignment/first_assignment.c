@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 typedef enum {NULL_VAL, INTEGER, FLOAT} ValueType;
 typedef enum {NUMBER, PLUS, MINUS, STAR, DIVISION, LP, RP, END} TokenType;
