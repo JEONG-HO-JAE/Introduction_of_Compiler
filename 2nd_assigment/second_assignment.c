@@ -96,7 +96,6 @@ void reduce(int i) {
 		case 4: value[top] = value[old_top + 1]; break;
 		case 5: value[top] = value[old_top + 2]; break;
 		case 6: value[top] = value[old_top + 1]; break;
-		default: yyerror(2); break;
 	}
 }
 
@@ -147,8 +146,7 @@ Token multiple(Token token1, Token token2) {
 void yyerror(int i) {
     switch (i) {
         case 0: printf("Syntax Error\n"); break;
-        case 1: printf("Token Error : Only digits, (, ), *, + are allowed\n"); break;
-        case 2: printf("Reduction Error\n"); break;
+        case 1: printf("Illegal Error : Only digits, (, ), *, + are allowed\n"); break;
     }
     exit(1);
 }
